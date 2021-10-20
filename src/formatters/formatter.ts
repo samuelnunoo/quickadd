@@ -14,6 +14,8 @@ export abstract class Formatter {
     protected value: string;
     protected variables: Map<string, string> = new Map<string, string>();
 
+    public setValue(value: string) { this.value = value;}
+
     protected abstract format(input: string): Promise<string>;
     
     protected replacer(str: string, reg: RegExp, replaceValue) {

@@ -1,4 +1,4 @@
-import type {App} from "obsidian";
+import type {App, TFile} from "obsidian";
 import type QuickAdd from "./main";
 import type IChoice from "./types/choices/IChoice";
 import {ChoiceType} from "./types/choices/choiceType";
@@ -12,6 +12,7 @@ import {MacroChoiceEngine} from "./engine/MacroChoiceEngine";
 import type {IChoiceExecutor} from "./IChoiceExecutor";
 import type IMultiChoice from "./types/choices/IMultiChoice";
 import ChoiceSuggester from "./gui/choiceSuggester";
+import {ExistingFileTemplateEngine} from "./engine/ExistingFileTemplateEngine";
 
 export class ChoiceExecutor implements IChoiceExecutor {
     public variables: Map<string, string> = new Map<string, string>();
@@ -39,6 +40,10 @@ export class ChoiceExecutor implements IChoiceExecutor {
             default:
                 break;
         }
+    }
+
+    async executeOnFile(choice: ITemplateChoice, file: TFile) {
+        await new ExistingFileTemplateEngine(choice, file, this).run();
     }
 
     private async onChooseTemplateType(templateChoice: ITemplateChoice): Promise<void> {

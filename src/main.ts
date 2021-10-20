@@ -1,4 +1,4 @@
-import {Plugin} from 'obsidian';
+import {Plugin, TFile} from 'obsidian';
 import {DEFAULT_SETTINGS, QuickAddSettings, QuickAddSettingsTab} from "./quickAddSettingsTab";
 import ChoiceSuggester from "./gui/choiceSuggester";
 import {log} from "./logger/logManager";
@@ -12,9 +12,10 @@ import type IMultiChoice from "./types/choices/IMultiChoice";
 import {deleteObsidianCommand} from "./utility";
 import type IMacroChoice from "./types/choices/IMacroChoice";
 import GenericInputPrompt from "./gui/GenericInputPrompt/GenericInputPrompt";
+import type ITemplateChoice from "./types/choices/ITemplateChoice";
 
 export default class QuickAdd extends Plugin {
-	static instance;
+	static instance: QuickAdd;
 	settings: QuickAddSettings;
 
 	async onload() {
@@ -56,8 +57,24 @@ export default class QuickAdd extends Plugin {
 
 		this.addSettingTab(new QuickAddSettingsTab(this.app, this));
 
-		this.app.workspace.onLayoutReady( () =>
-			new StartupMacroEngine(this.app, this, this.settings.macros, new ChoiceExecutor(this.app, this)).run());
+		this.app.workspace.onLayoutReady( () =>{
+			new StartupMacroEngine(this.app, this, this.settings.macros, new ChoiceExecutor(this.app, this)).run()
+
+			this.app.vault.on('create', file => {
+				console.log(`New file created with name: ${file.name}`);
+				const choice: ITemplateChoice = this.getChoice("name", "✍ Note (title)") as ITemplateChoice;
+				if (!choice) {
+					console.log("Choice was not found.")
+					return;
+				}
+
+
+				if (file instanceof TFile) {
+					new ChoiceExecutor(this.app, this).executeOnFile(choice, file);
+					console.log("Did execute on file.")
+				}
+			});
+		});
 		this.addCommandsForChoices(this.settings.choices);
 
 		await this.convertMacroChoicesMacroToId();
