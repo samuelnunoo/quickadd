@@ -10,6 +10,7 @@ import {MarkdownView} from "obsidian";
 import type {IChoiceExecutor} from "../IChoiceExecutor";
 import {INLINE_JAVASCRIPT_REGEX} from "../constants";
 import {SingleInlineScriptEngine} from "../engine/SingleInlineScriptEngine";
+import {TextInputPrompt} from "../gui/GenericInputPrompt/TextInputPrompt";
 
 export class CompleteFormatter extends Formatter {
     private valueHeader: string;
@@ -66,14 +67,14 @@ export class CompleteFormatter extends Formatter {
         if (!this.value) {
             const selectedText: string = await this.getSelectedText();
             this.value = selectedText ? selectedText :
-                await GenericInputPrompt.Prompt(this.app, this.valueHeader ?? `Enter value`)
+                await TextInputPrompt.Prompt(this.app, this.valueHeader ?? `Enter value`)
         }
 
         return this.value;
     }
 
     protected async promptForVariable(header?: string): Promise<string> {
-        return await GenericInputPrompt.Prompt(this.app, header);
+        return await TextInputPrompt.Prompt(this.app, header);
     }
 
     protected async suggestForValue(suggestedValues: string[]) {

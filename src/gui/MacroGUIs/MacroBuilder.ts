@@ -27,6 +27,7 @@ import {log} from "../../logger/logManager";
 import {SelectActiveLineCommand} from "../../types/macros/EditorCommands/SelectActiveLineCommand";
 import {SelectLinkOnActiveLineCommand} from "../../types/macros/EditorCommands/SelectLinkOnActiveLineCommand";
 import GenericYesNoPrompt from "../GenericYesNoPrompt/GenericYesNoPrompt";
+import {TextInputPrompt} from "../GenericInputPrompt/TextInputPrompt";
 
 export class MacroBuilder extends Modal {
     public macro: IMacro;
@@ -81,7 +82,7 @@ export class MacroBuilder extends Modal {
         headerEl.addClass('clickable');
 
         headerEl.addEventListener('click', async () => {
-            const newMacroName: string = await GenericInputPrompt.Prompt(this.app, `Update name for ${this.macro.name}`, this.macro.name);
+            const newMacroName: string = await TextInputPrompt.Prompt(this.app, `Update name for ${this.macro.name}`, this.macro.name);
             if (!newMacroName) return;
 
             this.macro.name = newMacroName;

@@ -10,6 +10,7 @@ import {log} from "./logger/logManager";
 import {CompleteFormatter} from "./formatters/completeFormatter";
 import {getDate} from "./utility";
 import {MarkdownView} from "obsidian";
+import {TextInputPrompt} from "./gui/GenericInputPrompt/TextInputPrompt";
 
 export class QuickAddApi {
     public static GetApi(app: App, plugin: QuickAdd, choiceExecutor: IChoiceExecutor) {
@@ -69,7 +70,7 @@ export class QuickAddApi {
 
     public static async inputPrompt(app: App, header: string, placeholder?: string, value?: string) {
         try {
-            return await GenericInputPrompt.Prompt(app, header, placeholder, value);
+            return await TextInputPrompt.Prompt(app, header, placeholder, value);
         } catch {
             return undefined;
         }

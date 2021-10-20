@@ -12,9 +12,11 @@ import type IMultiChoice from "./types/choices/IMultiChoice";
 import {deleteObsidianCommand} from "./utility";
 import type IMacroChoice from "./types/choices/IMacroChoice";
 import GenericInputPrompt from "./gui/GenericInputPrompt/GenericInputPrompt";
+import {TextInputPrompt} from "./gui/GenericInputPrompt/TextInputPrompt";
+import {TextAreaInputPrompt} from "./gui/GenericInputPrompt/TextAreaInputPrompt";
 
 export default class QuickAdd extends Plugin {
-	static instance;
+	static instance: QuickAdd;
 	settings: QuickAddSettings;
 
 	async onload() {
@@ -45,7 +47,7 @@ export default class QuickAdd extends Plugin {
 			id: 'testQuickAdd',
 			name: 'Test QuickAdd (dev)',
 			callback: async () => {
-				const p = await GenericInputPrompt.Prompt(this.app, "Header", "placeholder", "valueset");
+				const p = await TextAreaInputPrompt.Prompt(this.app, "Header", "placeholder", "valueset");
 				console.log(p)
 			}
 		})

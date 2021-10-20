@@ -1,22 +1,17 @@
-import {App, ButtonComponent, Modal, TextComponent} from "obsidian";
+import {App, ButtonComponent, Modal, TextAreaComponent, TextComponent,} from "obsidian";
 import {SilentFileAndTagSuggester} from "../silentFileAndTagSuggester";
 
-export default class GenericInputPrompt extends Modal {
+export default abstract class GenericInputPrompt<InputComponent extends (TextComponent | TextAreaComponent)> extends Modal {
     public waitForClose: Promise<string>;
+
+    protected input: string;
+    protected inputComponent: InputComponent;
 
     private resolvePromise: (input: string) => void;
     private rejectPromise: (reason?: any) => void;
     private didSubmit: boolean = false;
-    private inputComponent: TextComponent;
-    private input: string;
     private readonly placeholder: string;
     private suggester: SilentFileAndTagSuggester;
-
-
-    public static Prompt(app: App, header: string, placeholder?: string, value?: string): Promise<string> {
-        const newPromptModal = new GenericInputPrompt(app, header, placeholder, value);
-        return newPromptModal.waitForClose;
-    }
 
     protected constructor(app: App, private header: string, placeholder?: string, value?: string) {
         super(app);
@@ -38,6 +33,7 @@ export default class GenericInputPrompt extends Modal {
 
     private display() {
         this.contentEl.empty();
+        this.customizeModal(this.modalEl);
         this.titleEl.textContent = this.header;
 
         const mainContentContainer: HTMLDivElement = this.contentEl.createDiv();
@@ -45,16 +41,38 @@ export default class GenericInputPrompt extends Modal {
         this.createButtonBar(mainContentContainer);
     }
 
-    protected createInputField(container: HTMLElement, placeholder?: string, value?: string) {
-        const textComponent = new TextComponent(container);
+    protected abstract createInputField(container: HTMLElement, placeholder?: string, value?: string): InputComponent;
 
+    protected abstract submitKeyPressed(evt: KeyboardEvent);
+
+    protected abstract customizeModal(modal: HTMLElement);
+
+    protected submitEnterCallback(evt: KeyboardEvent) {
+        if (this.submitKeyPressed(evt)) {
+            evt.preventDefault();
+            this.submit();
+        }
+    }
+
+    protected submitClickCallback = (evt: MouseEvent) => this.submit();
+    protected cancelClickCallback = (evt: MouseEvent) => this.cancel();
+
+    protected submit() {
+        this.didSubmit = true;
+
+        this.close();
+    }
+
+    protected cancel() {
+        this.close();
+    }
+
+    protected setupInputComponent(textComponent: InputComponent, placeholder: string, value: string) {
         textComponent.inputEl.style.width = "100%";
         textComponent.setPlaceholder(placeholder ?? "")
             .setValue(value ?? "")
             .onChange(value => this.input = value)
-            .inputEl.addEventListener('keydown', this.submitEnterCallback);
-
-        return textComponent;
+            .inputEl.addEventListener('keydown', this.submitEnterCallback.bind(this));
     }
 
     private createButton(container: HTMLElement, text: string, callback: (evt: MouseEvent) => any) {
@@ -75,26 +93,6 @@ export default class GenericInputPrompt extends Modal {
         buttonBarContainer.style.flexDirection = 'row-reverse';
         buttonBarContainer.style.justifyContent = 'flex-start';
         buttonBarContainer.style.marginTop = '1rem';
-    }
-
-    private submitClickCallback = (evt: MouseEvent) => this.submit();
-    private cancelClickCallback = (evt: MouseEvent) => this.cancel();
-
-    private submitEnterCallback = (evt: KeyboardEvent) => {
-        if (evt.key === "Enter") {
-            evt.preventDefault();
-            this.submit();
-        }
-    }
-
-    private submit() {
-        this.didSubmit = true;
-
-        this.close();
-    }
-
-    private cancel() {
-        this.close();
     }
 
     private resolveInput() {
@@ -119,3 +117,4 @@ export default class GenericInputPrompt extends Modal {
         this.removeInputListener();
     }
 }
+

@@ -4,6 +4,7 @@ import type {SvelteComponent} from "svelte";
 import {GenericTextSuggester} from "../genericTextSuggester";
 import GenericInputPrompt from "../GenericInputPrompt/GenericInputPrompt";
 import {log} from "../../logger/logManager";
+import {TextInputPrompt} from "../GenericInputPrompt/TextInputPrompt";
 
 export abstract class ChoiceBuilder extends Modal {
     private resolvePromise: (input: IChoice) => void;
@@ -58,7 +59,7 @@ export abstract class ChoiceBuilder extends Modal {
 
         headerEl.addEventListener('click', async ev => {
             try {
-                const newName: string = await GenericInputPrompt.Prompt(this.app, choice.name, "Choice name", choice.name);
+                const newName: string = await TextInputPrompt.Prompt(this.app, choice.name, "Choice name", choice.name);
                 if (newName !== choice.name) {
                     choice.name = newName;
                     headerEl.setText(newName);
