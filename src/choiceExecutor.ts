@@ -12,17 +12,21 @@ import {MacroChoiceEngine} from "./engine/MacroChoiceEngine";
 import type {IChoiceExecutor} from "./IChoiceExecutor";
 import type IMultiChoice from "./types/choices/IMultiChoice";
 import ChoiceSuggester from "./gui/choiceSuggester";
+import ITemplateChoice from './types/choices/ITemplateChoice';
 
+
+
+type partialChoice = Partial<ITemplateChoice> | Partial<ICaptureChoice> | Partial<IMacroChoice> | Partial<IMultiChoice>
 export class ChoiceExecutor implements IChoiceExecutor {
     public variables: Map<string, string> = new Map<string, string>();
 
     constructor(private app: App, private plugin: QuickAdd) { }
 
-    async execute(choice: IChoice): Promise<void> {
+    async execute(choice: IChoice,override?:partialChoice): Promise<void> {
         switch (choice.type) {
             case ChoiceType.Template:
                 const templateChoice: ITemplateChoice = choice as ITemplateChoice;
-                await this.onChooseTemplateType(templateChoice);
+                await this.onChooseTemplateType(templateChoice,override);
                 break;
             case ChoiceType.Capture:
                 const captureChoice: ICaptureChoice = choice as ICaptureChoice;
@@ -41,13 +45,15 @@ export class ChoiceExecutor implements IChoiceExecutor {
         }
     }
 
-    private async onChooseTemplateType(templateChoice: ITemplateChoice): Promise<void> {
+    private async onChooseTemplateType(templateChoice: ITemplateChoice,override:Partial<ITemplateChoice>|null): Promise<void> {
         if (!templateChoice.templatePath) {
             log.logError(`please provide a template path for ${templateChoice.name}`);
             return;
         }
 
-        await new TemplateChoiceEngine(this.app, this.plugin, templateChoice, this).run();
+        const templateEngine = new TemplateChoiceEngine(this.app,this.plugin,templateChoice,this);
+        if (override) templateEngine.overrideChoice(override)
+        await templateEngine.run();
     }
 
     private async onChooseCaptureType(captureChoice: ICaptureChoice) {

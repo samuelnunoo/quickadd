@@ -90,6 +90,13 @@ export class TemplateChoiceEngine extends TemplateEngine {
         }
     }
 
+    public overrideChoice(overrideValues:Partial<ITemplateChoice>) {
+        this.choice = {
+            ...this.choice,
+            ...overrideValues
+        }
+    }
+
     private async formatFolderPaths(folders: string[]) {
         const folderPaths = await Promise.all(folders.map(async (folder) => {
             return await this.formatter.formatFolderPath(folder);

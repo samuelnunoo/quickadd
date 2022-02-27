@@ -7,6 +7,7 @@ import GenericSuggester from "../gui/GenericSuggester/genericSuggester";
 import {FILE_NUMBER_REGEX, MARKDOWN_FILE_EXTENSION_REGEX} from "../constants";
 import {log} from "../logger/logManager";
 import type {IChoiceExecutor} from "../IChoiceExecutor";
+import ITemplateChoice from "src";
 
 export abstract class TemplateEngine extends QuickAddEngine {
     protected formatter: CompleteFormatter;
@@ -20,6 +21,8 @@ export abstract class TemplateEngine extends QuickAddEngine {
 
     public abstract run(): Promise<void> | Promise<string> | Promise<{file: TFile, content: string}>;
 
+    public abstract overrideChoice(overrideValues:Partial<ITemplateChoice>):void;
+    
     protected async getOrCreateFolder(folders: string[]): Promise<string> {
         let folderPath: string;
 
