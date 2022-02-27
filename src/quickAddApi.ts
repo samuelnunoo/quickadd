@@ -11,6 +11,7 @@ import {CompleteFormatter} from "./formatters/completeFormatter";
 import {getDate} from "./utility";
 import {MarkdownView} from "obsidian";
 import GenericWideInputPrompt from "./gui/GenericWideInputPrompt/GenericWideInputPrompt";
+import type {partialChoice} from "./choiceExecutor";
 
 export class QuickAddApi {
     public static GetApi(app: App, plugin: QuickAdd, choiceExecutor: IChoiceExecutor) {
@@ -20,7 +21,7 @@ export class QuickAddApi {
             yesNoPrompt: (header: string, text?: string) => {return this.yesNoPrompt(app, header, text)},
             suggester: (displayItems: string[] | ((value: string, index?: number, arr?: string[]) => string[]), actualItems: string[]) => {return this.suggester(app, displayItems, actualItems)},
             checkboxPrompt: (items: string[], selectedItems?: string[]) => {return this.checkboxPrompt(app, items, selectedItems)},
-            executeChoice: async (choiceName: string, variables?: {[key: string]: any}) => {
+            executeChoice: async (choiceName: string, variables?: {[key: string]: any},override?:partialChoice) => {
                 const choice: IChoice = plugin.getChoiceByName(choiceName);
                 if (!choice) log.logError(`choice named '${choiceName}' not found`);
 
@@ -30,7 +31,7 @@ export class QuickAddApi {
                     });
                 }
 
-                await choiceExecutor.execute(choice);
+                await choiceExecutor.execute(choice,override);
                 choiceExecutor.variables.clear();
             },
             format: async (input: string) => {

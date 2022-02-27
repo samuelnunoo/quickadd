@@ -12,11 +12,9 @@ import {MacroChoiceEngine} from "./engine/MacroChoiceEngine";
 import type {IChoiceExecutor} from "./IChoiceExecutor";
 import type IMultiChoice from "./types/choices/IMultiChoice";
 import ChoiceSuggester from "./gui/choiceSuggester";
-import ITemplateChoice from './types/choices/ITemplateChoice';
 
+export type partialChoice = Partial<ITemplateChoice> | Partial<ICaptureChoice> | Partial<IMacroChoice> | Partial<IMultiChoice>
 
-
-type partialChoice = Partial<ITemplateChoice> | Partial<ICaptureChoice> | Partial<IMacroChoice> | Partial<IMultiChoice>
 export class ChoiceExecutor implements IChoiceExecutor {
     public variables: Map<string, string> = new Map<string, string>();
 
@@ -38,7 +36,7 @@ export class ChoiceExecutor implements IChoiceExecutor {
                 break;
             case ChoiceType.Multi:
                 const multiChoice: IMultiChoice = choice as IMultiChoice;
-                await this.onChooseMultiType(multiChoice);
+                await this.onChooseMultiType(multiChoice;
                 break
             default:
                 break;
@@ -55,6 +53,8 @@ export class ChoiceExecutor implements IChoiceExecutor {
         if (override) templateEngine.overrideChoice(override)
         await templateEngine.run();
     }
+
+
 
     private async onChooseCaptureType(captureChoice: ICaptureChoice) {
         if (!captureChoice.captureTo && !captureChoice?.captureToActiveFile) {
